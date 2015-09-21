@@ -1,0 +1,30 @@
+base.py
+    -check staticfiles_dir
+local.env
+wsgi.py
+navbar.html
+navbar_dropdown.html
+Gruntfile.js
+
+[Re-install overextends]
+
+pip install git+https://github.com/taedori81/django-overextends.git
+
+local.env database field
+make database -> createdb project_name
+change owner of database -> ALTER DATABASE database_name OWNER TO taedori
+or Grant permission also -> GRANT ALL PRIVILEGES ON DATABASE database_name TO taedori
+
+[Redis-cache]
+# Change /etc/redis/redis.conf
+# comment out bind section and uncomment unixsocket section
+
+unixsocket /var/run/redis/redis.sock
+unixsocketperm 777
+
+
+[setup]
+mkvirtualenv --python=/usr/bin/python3 {{ project_name }}
+pip install -r requirements.txt
+python setup.py develop
+saleor syncdb

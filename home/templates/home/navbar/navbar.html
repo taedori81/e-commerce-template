@@ -1,0 +1,71 @@
+{% load {{ project_name }}_tags wagtailcore_tags i18n %}
+
+{% get_site_root as site_root %}
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% pageurl site_root %}">{{ project_name }}</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                {% for menuitem in menuitems %}
+                    <li class="{% if menuitem.active %}active{% endif %}{% if menuitem.show_dropdown %}{% endif %}">
+                        {% if menuitem.show_dropdown %}
+                            <li class="dropdown">
+                                <a href="{% pageurl menuitem %}" class="dropdown-toggle" id="dropdown1" data-toggle="dropdown">
+                                    {{ menuitem.title }}<span class="caret"></span></a>
+                                {% display_navbar_dropdown parent=menuitem %}
+                            </li>
+                        {% else %}
+                            <a href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                    <li class="dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="{% url "cart:index" %}"><i class="fa fa-shopping-cart"></i> {% trans "My cart" %} {% if request.cart %}<span class="badge">{{ request.cart.count }}</span>{% endif %} <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url "cart:index" %}">{% trans "View cart contents" %}</a></li>
+                            {% if request.cart %}
+                            <li class="divider"></li>
+                            {% for item in request.cart %}
+                            <li>
+                                <a href="{% url 'product:details' slug=item.data.product_slug product_id=item.data.product_id %}">
+                                    {{ item.product }}{% if item.quantity != 1 %} <em>×{{ item.quantity }}</em>{% endif %}
+                                </a>
+                            </li>
+                            {% endfor %}
+                            <li class="divider"></li>
+                            <li><a href="{% url "checkout:index" %}">{% trans "Proceed to checkout" %}</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                        <li class="dropdown">
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="."><i class="glyphicon glyphicon-user"></i> {{ request.user }} <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url "profile:details" %}">{% trans "Your profile" %}</a></li>
+                                <li><a href="{% url "profile:orders" %}">{% trans "Your orders" %}</a></li>
+                                {% if request.user.is_staff %}
+                                    <li class="divider"></li>
+                                    <li><a href="{% url "dashboard:index" %}">{% trans "Dashboard" %}</a></li>
+                                {% endif %}
+                                <li class="divider"></li>
+                                <li><a href="{% url "registration:logout" %}">{% trans "Log out" %}</a></li>
+                              </ul>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{% url "registration:login" %}">Log in</a>
+                        </li>
+                    {% endif %}
+            </ul>
+        </div>
+
+    </div>
+</nav>
